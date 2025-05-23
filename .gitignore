@@ -1,8 +1,8 @@
-# Ignore all directories inside .vs
-.vs/**/
+# Ignore everything in .vs folder
+.vs/**
 
-# But allow individual files directly inside .vs
-!.vs/*
+# Except allow the specific file tasks.vs.json
+!.vs/tasks.vs.json
 
 Build
 *.aps

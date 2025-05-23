@@ -1,9 +1,14 @@
-name: Build App
+name: Build Winhider App
 
 on:
   push:
+    branches:
+      - main         # For untagged builds like "latest"
+    tags:
+      - 'v*'         # For tagged releases like v1.0.0
   pull_request:
     types: [closed]
+  workflow_dispatch: # Manual trigger via GitHub UI
 
 jobs:
   build:

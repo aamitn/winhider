@@ -1,6 +1,9 @@
 name: Build App
 
-on: [push]
+on:
+  push:
+  pull_request:
+    types: [closed]
 
 jobs:
   build:
@@ -15,11 +18,11 @@ jobs:
 
       - name: Build Project
         run: |
-          msbuild Invisiwind.sln /p:Configuration=Release /p:Platform=x64 -m
-          msbuild Invisiwind.sln /p:Configuration=Release /p:Platform=x86 -m
+          msbuild Winhider.sln /p:Configuration=Release /p:Platform=x64 -m
+          msbuild Winhider.sln /p:Configuration=Release /p:Platform=x86 -m
 
       - name: Generate zip bundle
-        run: 7z a -tzip Invisiwind.zip .\hide.ahk .\Build\bin\Release\*.dll .\Build\bin\Release\*.exe
+        run: 7z a -tzip Winhider.zip .\hide.ahk .\Build\bin\Release\*.dll .\Build\bin\Release\*.exe
 
       - name: Build Installer
         run: iscc .\Misc\inno.iss
@@ -31,8 +34,8 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           files: |
-            Invisiwind.zip
-            Misc/Output/InvisiwindInstaller.exe
+            Winhider.zip
+            Misc/Output/WinhiderInstaller.exe
 
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Publish tagged release
@@ -41,5 +44,5 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
-            Invisiwind.zip
-            Misc/Output/InvisiwindInstaller.exe
+            Winhider.zip
+            Misc/Output/WinhiderInstaller.exe

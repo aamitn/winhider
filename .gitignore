@@ -1,3 +1,8 @@
-.vs
+# Ignore all directories inside .vs
+.vs/**/
+
+# But allow individual files directly inside .vs
+!.vs/*
+
 Build
 *.aps

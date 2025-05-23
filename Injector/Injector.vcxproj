@@ -24,7 +24,7 @@
     <ProjectGuid>{781c8a65-1020-481d-9448-f69ee1d370f4}</ProjectGuid>
     <RootNamespace>Injector</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Invisiwind</ProjectName>
+    <ProjectName>Winhider</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -110,6 +110,13 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>call "..\hide_hotkey_compile.cmd" || exit /b 0
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Generate AHK Compiled Binary</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -129,6 +136,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>call "..\hide_hotkey_compile.cmd" || exit /b 0
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Generate AHK Compiled Binary</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -142,6 +156,13 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>call "..\hide_hotkey_compile.cmd" || exit /b 0
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Generate AHK Compiled Binary</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -160,6 +181,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>call "..\hide_hotkey_compile.cmd" || exit /b 0
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Generate AHK Compiled Binary</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Injector.cpp" />
@@ -168,10 +196,10 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Invisiwind.rc" />
+    <ResourceCompile Include="Winhider.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Misc\invicon.ico" />
+    <Image Include="..\Misc\whicon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

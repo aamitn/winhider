@@ -1,4 +1,4 @@
-// Injector.cpp : This file contains the 'main' function. Program execution begins and ends there.
+﻿// Injector.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
@@ -17,29 +17,48 @@ using std::endl;
 
 #ifdef _WIN64
 const bool iAm64bit = true;
-const std::wstring hideDllName{ L"./Hide.dll" };
-const std::wstring unhideDllName{ L"./Unhide.dll" };
+const std::wstring hideScreenshareDllName{ L"./Hide.dll" };
+const std::wstring hideTaskbarDllName{ L"./HideTask.dll" };
+const std::wstring unhideScreenshareDllName{ L"./Unhide.dll" };
+const std::wstring unhideTaskbarDllName{ L"./UnhideTask.dll" };
 #else
 const bool iAm64bit = false;
-const std::wstring hideDllName{ L"./Hide_32bit.dll" };
-const std::wstring unhideDllName{ L"./Unhide_32bit.dll" };
+const std::wstring hideScreenshareDllName{ L"./Hide_32bit.dll" };
+const std::wstring hideTaskbarDllName{ L"./HideTask_32bit.dll" };
+const std::wstring unhideScreenshareDllName{ L"./Unhide_32bit.dll" };
+const std::wstring unhideTaskbarDllName{ L"./UnhideTask_32bit.dll" };
 #endif
 
-const std::wstring exeName{ L"./Invisiwind.exe" };
-const std::wstring exeName32{ L"./Invisiwind_32bit.exe" };
-const std::wstring title{ L"  _____            _     _          _           _ \n"
-"  \\_   \\_ ____   _(_)___(_)_      _(_)_ __   __| |\n"
-"   / /\\/ '_ \\ \\ / / / __| \\ \\ /\\ / / | '_ \\ / _` |\n"
-"/\\/ /_ | | | \\ V /| \\__ \\ |\\ V  V /| | | | | (_| |\n"
-"\\____/ |_| |_|\\_/ |_|___/_| \\_/\\_/ |_|_| |_|\\__,_|" };
+
+const std::wstring exeName{ L"./Winhider.exe" };
+const std::wstring exeName32{ L"./Winhider_32bit.exe" };
+const std::wstring title1 = L"\x1b[1m\x1b[36mWinHider\x1b[0m\n";
+
+const std::wstring title = LR"(
+ _____                                                       _____ 
+( ___ )                                                     ( ___ )
+ |   |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|   | 
+ |   |                                                       |   | 
+ |   |  __        __ _         _   _  _      _               |   | 
+ |   |  \ \      / /(_) _ __  | | | |(_)  __| |  ___  _ __   |   | 
+ |   |   \ \ /\ / / | || '_ \ | |_| || | / _` | / _ \| '__|  |   | 
+ |   |    \ V  V /  | || | | ||  _  || || (_| ||  __/| |     |   | 
+ |   |     \_/\_/   |_||_| |_||_| |_||_| \__,_| \___||_|     |   | 
+ |   |                                                       |   | 
+ |___|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|___| 
+(_____)                                                     (_____)
+)";
+
 
 void showHelp(const wchar_t* argZero) {
-	std::wcout << "Invisiwind - Hide certain windows from screenshares.\n"
+	std::wcout << "WinHider - Hide certain windows from screenshares.\n"
 		"\n"
-		"Usage: " << argZero << " [--hide | --unhide] PID_OR_PROCESS_NAME ...\n"
+		"Usage: " << argZero << " [--hide | --unhide | --hidetask | --unhidetask  ] PID_OR_PROCESS_NAME ...\n"
 		"\n"
-		"  -h, --hide      Hide the specified applications. This is default.\n"
-		"  -u, --unhide    Unhide the applications specified.\n"
+		"  -h, --hide      Hide the specified applications from screenshare\n"
+		"  -u, --unhide    Unhide the applications specified from screenshare\n"
+		"  -h, --hidetask      Hide the specified applications from task bar/switcher \n"
+		"  -u, --unhidetask    Unhide the applications specified from task bar/switcher\n"
 		"      --help      Show this help menu.\n"
 		"\n"
 		"  PID_OR_PROCESS_NAME The process id or the process name to hide.\n"
@@ -47,7 +66,10 @@ void showHelp(const wchar_t* argZero) {
 		"Examples:\n"
 		<< argZero << " 89203\n"
 		<< argZero << " firefox.exe\n"
-		<< argZero << " --unhide discord.exe obs64.exe\n";
+		<< argZero << " --hide discord.exe obs64.exe\n"
+		<< argZero << " --unhide discord.exe obs64.exe\n"
+		<< argZero << " --hidetask notepad.exe obs64.exe\n"
+		<< argZero << " --unhidetask notepad.exe obs64.exe\n";
 }
 
 // Most functions have two types - A (ANSI - old) and W (Unicode - new)
@@ -163,7 +185,10 @@ std::wstring getFullFilePath(const std::wstring& filename) {
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
 	// Check if DLL exists and then store path
-	std::wstring hideDllPath{ getFullFilePath(hideDllName) }, unhideDllPath{ getFullFilePath(unhideDllName) };
+	std::wstring hideScreenshareDllPath{ getFullFilePath(hideScreenshareDllName) };
+	std::wstring hideTaskbarDllPath{ getFullFilePath(hideTaskbarDllName) };
+	std::wstring unhideScreenshareDllPath{ getFullFilePath(unhideScreenshareDllName) };
+	std::wstring unhideTaskbarDllPath{ getFullFilePath(unhideTaskbarDllName) };
 
 	// Check if 32-bit version of the executable exists
 	std::wstring x86binPath{ getFullFilePath(exeName32) };
@@ -199,7 +224,10 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 					std::wstring cliargs;
 					cliargs += exeName32;
 					cliargs += L" ";
-					if (dllFullPath == unhideDllPath) cliargs += L"-u ";
+					// Pass the DLL path as an argument
+					cliargs += L"\"";
+					cliargs += dllFullPath;
+					cliargs += L"\" ";
 					cliargs += std::to_wstring(pid);
 
 					if (CreateProcess(x86binPath.c_str(), &cliargs[0], NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
@@ -272,94 +300,50 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 			else std::cerr << "Failed to acquire handle on kernel32.dll." << GetLastErrorWithMessage() << std::endl;
 		}
 		else std::cerr << "Failed to acquire handle on process " << pid << "." << GetLastErrorWithMessage() << std::endl;
-	};
+		};
 
-	if (argc > 1) {
-		bool hide = true;
-		for (int i = 1; i < argc; i++) {
-			std::wstring arg{ argv[i] };
-			std::transform(arg.begin(), arg.end(), arg.begin(), ::towlower);
-			if ((arg == L"-h" and argc == 2) or arg == L"--help" or arg == L"/?") {
-				showHelp(argv[0]);
-				return 0;
-			}
-			else if (arg == L"-h" or arg == L"--hide") {
-				hide = true;
-			}
-			else if (arg == L"-u" or arg == L"--unhide") {
-				hide = false;
-			}
-			else if (isValidPID(arg)) {
-				inject(stoi(arg), hide ? hideDllPath : unhideDllPath);
-			}
-			else {
-				auto pids = getPIDsFromProcName(arg);
+		if (argc > 1) {
+			// Add new DLL path variables at the top of wmain:
+			std::wstring hideScreenshareDllPath{ getFullFilePath(hideScreenshareDllName) };
+			std::wstring unhideScreenshareDllPath{ getFullFilePath(unhideScreenshareDllName) };
+			std::wstring hideTaskbarDllPath{ getFullFilePath(hideTaskbarDllName) };
+			std::wstring unhideTaskbarDllPath{ getFullFilePath(unhideTaskbarDllName) };
 
-				// If we find no results, append .exe and try again
-				if (pids.empty()) pids = getPIDsFromProcName(arg.append(L".exe"));
+			// Default to screenshare hide
+			enum class HideType { Screenshare, Taskbar } hideType = HideType::Screenshare;
+			bool hide = true;
 
-				if (pids.empty())
-					std::wcerr << L"No process found with the name " << argv[i] << endl;
-				for (auto& pid : pids)
-					inject(pid, hide ? hideDllPath : unhideDllPath);
-			}
-		}
-		return 0;
-	}
+			for (int i = 1; i < argc; i++) {
+				std::wstring arg{ argv[i] };
+				std::transform(arg.begin(), arg.end(), arg.begin(), ::towlower);
 
-	// Interactive mode
-	std::wcout << title << endl;
-	std::wcout << "Hey I'm Invisiwind, here to make windows invisible to everyone but you ^_^" << endl;
-	std::wcout << "Type `help` to get started." << endl;
-
-	int enterPressed{};
-	while (true) {
-		std::wstring input;
-		cout << "> ";
-		getline(std::wcin, input);
-		if (input.empty()) {
-			if (enterPressed++) {
-				cout << "Exiting .. Have a great day!";
-				return 0;
-			}
-			cout << "Press Enter again to exit" << endl;
-		}
-		else {
-			enterPressed = 0;
-
-			auto delimPos = input.find(L" ");
-			std::wstring command = input.substr(0, delimPos);
-
-			if (command == L"help" or command == L"`help`") {
-				std::cout << "Available commands: \n"
-					"\n"
-					"  hide PROCESS_ID_OR_NAME       Hides the specified application\n"
-					"  unhide PROCESS_ID_OR_NAME     Unhides the specified application\n"
-					"  list                          Lists all applications\n"
-					"  help                          Shows this help menu\n"
-					"  exit                          Exit\n"
-					"\n"
-					"Examples:\n"
-					"hide notepad.exe\n"
-					"list\n"
-					"unhide discord.exe\n";
-			}
-			else if (command == L"list") {
-				std::wcout << std::setw(35) << std::left << "Process name" << "PID" << endl;
-				for (auto& [pName, pIDs] : getProcList()) {
-					std::wcout << std::setw(35) << std::left << pName;
-					for (auto& pID : pIDs) std::cout << pID << " ";
-					cout << endl;
+				if ((arg == L"-h" && argc == 2) || arg == L"--help" || arg == L"/?") {
+					showHelp(argv[0]);
+					return 0;
 				}
-			}
-			else if (command == L"hide" or command == L"unhide") {
-				if (delimPos == std::wstring::npos) {
-					std::wcout << "Usage: " << command << " PROCESS_ID_OR_NAME\n";
-					continue;
+				else if (arg == L"-h" || arg == L"--hide") {
+					hide = true;
+					hideType = HideType::Screenshare;
 				}
-				std::wstring arg = input.substr(delimPos + 1);
-				if (isValidPID(arg)) {
-					inject(stoi(arg), command == L"hide" ? hideDllPath : unhideDllPath);
+				else if (arg == L"-u" || arg == L"--unhide") {
+					hide = false;
+					hideType = HideType::Screenshare;
+				}
+				else if (arg == L"-ht" || arg == L"--hidetask") {
+					hide = true;
+					hideType = HideType::Taskbar;
+				}
+				else if (arg == L"-uht" || arg == L"--unhidetask") {
+					hide = false;
+					hideType = HideType::Taskbar;
+				}
+				else if (isValidPID(arg)) {
+					std::wstring dllPath;
+					if (hideType == HideType::Screenshare)
+						dllPath = hide ? hideScreenshareDllPath : unhideScreenshareDllPath;
+					else
+						dllPath = hide ? hideTaskbarDllPath : unhideTaskbarDllPath;
+					inject(stoi(arg), dllPath);
 				}
 				else {
 					auto pids = getPIDsFromProcName(arg);
@@ -368,20 +352,114 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 					if (pids.empty()) pids = getPIDsFromProcName(arg.append(L".exe"));
 
 					if (pids.empty())
-						std::wcerr << L"No process found with the name " << input.substr(delimPos + 1) << endl;
-					for (auto& pid : pids)
-						inject(pid, command == L"hide" ? hideDllPath : unhideDllPath);
+						std::wcerr << L"No process found with the name " << argv[i] << endl;
+					for (auto& pid : pids) {
+						std::wstring dllPath;
+						if (hideType == HideType::Screenshare)
+							dllPath = hide ? hideScreenshareDllPath : unhideScreenshareDllPath;
+						else
+							dllPath = hide ? hideTaskbarDllPath : unhideTaskbarDllPath;
+						inject(pid, dllPath);
+					}
 				}
 			}
-			else if (command == L"exit" or command == L"quit") {
-				cout << "Exiting .. have a good day!\n";
-				return 0;
+			return 0;
+		}
+
+		// Interactive mode
+		std::wcout << title << endl;
+		std::wcout << "Hey I'm WinHider, here to make windows invisible from screenshare and taskbar to everyone but you ^_^" << endl;
+		std::wcout << "Type `help` to get started." << endl;
+
+		int enterPressed{};
+		while (true) {
+			std::wstring input;
+			cout << "> ";
+			getline(std::wcin, input);
+			if (input.empty()) {
+				if (enterPressed++) {
+					cout << "Exiting .. Have a great day!";
+					return 0;
+				}
+				cout << "Press Enter again to exit" << endl;
 			}
 			else {
-				cout << "Invalid command. Type `help` for help." << endl;
+				enterPressed = 0;
+
+				auto delimPos = input.find(L" ");
+				std::wstring command = input.substr(0, delimPos);
+
+				if (command == L"help" || command == L"`help`") {
+					std::cout << "Available commands: \n"
+						"\n"
+						"  hide PROCESS_ID_OR_NAME        Hides from screenshare\n"
+						"  unhide PROCESS_ID_OR_NAME      Unhides from screenshare\n"
+						"  hidetask PROCESS_ID_OR_NAME    Hides from taskbar/alt-tab\n"
+						"  unhidetask PROCESS_ID_OR_NAME  Unhides from taskbar/alt-tab\n"
+						"  list                           Lists all applications\n"
+						"  help                           Shows this help menu\n"
+						"  exit                           Exit\n"
+						"\n"
+						"Examples:\n"
+						"hide notepad.exe\n"
+						"hidetask notepad.exe\n"
+						"hidetask 12345\n"
+						"unhide discord.exe\n"
+						"unhidetask discord.exe\n"
+						"unhidetask 54321\n";
+				}
+				else if (command == L"list") {
+					std::wcout << std::setw(35) << std::left << "Process name" << "PID" << endl;
+					for (auto& [pName, pIDs] : getProcList()) {
+						std::wcout << std::setw(35) << std::left << pName;
+						for (auto& pID : pIDs) std::cout << pID << " ";
+						cout << endl;
+					}
+				}
+				else if (
+					command == L"hide" || command == L"unhide" ||
+					command == L"hidetask" || command == L"unhidetask"
+					) {
+					if (delimPos == std::wstring::npos) {
+						std::wcout << "Usage: " << command << " PROCESS_ID_OR_NAME\n";
+						continue;
+					}
+					std::wstring arg = input.substr(delimPos + 1);
+					std::wstring dllPath;
+
+					if (command == L"hide")
+						dllPath = hideScreenshareDllPath;
+					else if (command == L"unhide")
+						dllPath = unhideScreenshareDllPath;
+					else if (command == L"hidetask")
+						dllPath = hideTaskbarDllPath;
+					else if (command == L"unhidetask")
+						dllPath = unhideTaskbarDllPath;
+
+					if (isValidPID(arg)) {
+						inject(stoi(arg), dllPath);
+					}
+					else {
+						auto pids = getPIDsFromProcName(arg);
+
+						// If we find no results, append .exe and try again
+						if (pids.empty()) pids = getPIDsFromProcName(arg.append(L".exe"));
+
+						if (pids.empty())
+							std::wcerr << L"No process found with the name " << input.substr(delimPos + 1) << endl;
+						for (auto& pid : pids)
+							inject(pid, dllPath);
+					}
+				}
+				else if (command == L"exit" || command == L"quit") {
+					cout << "Exiting .. have a good day!\n";
+					return 0;
+				}
+				else {
+					cout << "Invalid command. Type `help` for help." << endl;
+				}
 			}
 		}
-	}
 
 	return 0;
 }

@@ -25,12 +25,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Invisiwind.rc">
+    <ResourceCompile Include="Winhider.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Misc\invicon.ico">
+    <Image Include="..\Misc\whicon.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -22,7 +22,7 @@ jobs:
           msbuild Winhider.sln /p:Configuration=Release /p:Platform=x86 -m
 
       - name: Generate zip bundle
-        run: 7z a -tzip Winhider.zip .\hide.ahk .\Build\bin\Release\*.dll .\Build\bin\Release\*.exe
+        run: 7z a -tzip Winhider.zip .\hide_hotkey.ahk .\Build\bin\Release\*.dll .\Build\bin\Release\*.exe
 
       - name: Build Installer
         run: iscc .\Misc\inno.iss

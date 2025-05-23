@@ -1,5 +1,7 @@
 # WinHider
 
+[![Build App](https://github.com/aamitn/winhider/actions/workflows/build.yml/badge.svg)](https://github.com/aamitn/winhider/actions/workflows/build.yml)
+
 WinHider (short for _Window Hider_) is an application that allows you to hide user defined windows from screensharing (zoom, ms-teams, gmeet etc.) and also from taskbar / taskswitcher (Alt-Tab)
 
 Original Fork From : [`https://github.com/radiantly/invisiwind`](https://github.com/radiantly/invisiwind)
@@ -9,8 +11,8 @@ Original Fork From : [`https://github.com/radiantly/invisiwind`](https://github.
 I think this is best explained with a couple of screenshots I took during a Zoom meeting:
 
 <p float="left">
-  <img src="./Misc/here.png" width="400" alt="What I see" />
-  <img src="./Misc/there.png" width="400" alt="What they see" />
+  <img src="./Misc/ss1.png" width="400" alt="What I see" />
+  <img src="./Misc/ss2.png" width="400" alt="What they see" />
 </p>
 
 The screenshot on the left is what I see. The one on the right is what everyone else sees.
@@ -50,7 +52,7 @@ Binaries Legend :
 - Download and extract the generated zip bundle from [here](https://github.com/aamitn/Winhider/releases/download/latest/Winhider.zip).
 - Run `Winhider.exe`. You will now be dropped into a terminal.
 
-![usage](./Misc/open.gif)
+![usage](./Misc/illustration.gif)
 
 Running it directly drops you into interactive mode. You can type `help` for more information.
 

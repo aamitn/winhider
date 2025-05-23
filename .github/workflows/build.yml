@@ -35,7 +35,7 @@ jobs:
       - name: Publish latest pre-release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: "${{ secrets.GH_WORKFLOW_TOKEN_WINHIDER }}"
           automatic_release_tag: "latest"
           prerelease: true
           files: |
@@ -46,7 +46,7 @@ jobs:
         name: Publish tagged release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: "${{ secrets.GH_WORKFLOW_TOKEN_WINHIDER }}"
           prerelease: false
           files: |
             Winhider.zip

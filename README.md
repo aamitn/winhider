@@ -1,5 +1,5 @@
 # WinHider
-<img src=".\MIsc\whicon.png" alt="WinHider Logo" width="100" height="100" align="left"/>
+<img src=".\Misc\whicon.png" alt="WinHider Logo" width="100" height="100" align="left"/>
 
 [![Build App](https://github.com/aamitn/winhider/actions/workflows/build.yml/badge.svg)](https://github.com/aamitn/winhider/actions/workflows/build.yml)
 

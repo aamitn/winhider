@@ -27,7 +27,7 @@ jobs:
           msbuild Winhider.sln /p:Configuration=Release /p:Platform=x86 -m
           
       - name: Sign Release Binaries
-        run: sign.cmd -p "\"${{ secrets.WINHIDER_CERT_SIGN_PASSWORD }}\""
+        run: sign.cmd -p '"${{ secrets.WINHIDER_CERT_SIGN_PASSWORD }}"'
 
       - name: Generate zip bundle
         run: 7z a -tzip Winhider.zip .\hide_hotkey.ahk .\Build\bin\Release\*.dll .\Build\bin\Release\*.exe
@@ -35,8 +35,8 @@ jobs:
       - name: Build Installer
         run: iscc .\Misc\inno.iss
         
-      - name: Sign Installer
-        run: sign.cmd -i -p "\"${{ secrets.WINHIDER_CERT_SIGN_PASSWORD }}\""
+      - name: Sign Release Binaries
+        run: sign.cmd -i -p '"${{ secrets.WINHIDER_CERT_SIGN_PASSWORD }}"'
 
       - name: Publish latest pre-release
         uses: marvinpinto/action-automatic-releases@latest

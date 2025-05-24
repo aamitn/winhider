@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "WinHider"
-#define MyAppVersion "1.1.6"
+#define MyAppVersion "0.8.4"
 #define MyAppPublisher "Bitmutex Technologies"
 #define MyAppURL "https://github.com/aamitn/winhider"
 
@@ -15,10 +15,20 @@ begin
     Result := 'Winhider_32bit.exe';
 end;
 
+[Code]
+function MyAppExeGuiName(Param: String): String;
+begin
+  if IsWin64 then 
+    Result := 'WinhiderGui.exe'
+  else 
+    Result := 'WinhiderGui_32bit.exe';
+end;
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{4896775D-F364-4AF8-AD6C-946EE5F49D95}
+;SignTool=winsdk_signtool
 AppName={#MyAppName} 
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -54,5 +64,8 @@ Source: "..\hide_hotkey.ahk"; DestDir: "{app}"; Flags: ignoreversion
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{code:MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{code:MyAppExeName}"; Tasks: desktopicon
 
+Name: "{autoprograms}\{#MyAppName}GUI"; Filename: "{app}\{code:MyAppExeGuiName}"
+Name: "{autodesktop}\{#MyAppName}GUI"; Filename: "{app}\{code:MyAppExeGuiName}"; Tasks: desktopicon
+
 [Run]
-Filename: "{app}\{code:MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{code:MyAppExeGuiName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

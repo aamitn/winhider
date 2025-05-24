@@ -4,14 +4,66 @@
     {
       "taskName": "AutoHotkey Script Runner",
       "taskType": "launch",
-      "appliesTo": "*.ahk", 
+      "appliesTo": "*.ahk",
       "context": "build",
-      "command":  "${workspaceRoot}\\ahk_embedded\\AutoHotkey32.exe",
+      "command": "${workspaceRoot}\\ahk_embedded\\AutoHotkey32.exe",
       "args": [
-        "${file}" 
+        "${file}"
       ],
-      "inheritEnvironments": [ "msvc-x86" ],
-      "outputs": [] 
+      "inheritEnvironments": [
+        "msvc-x86"
+      ],
+      "outputs": []
+    },
+    {
+      "taskName": ".CMD Batch File Runner",
+      "taskType": "launch",
+      "appliesTo": "*.cmd",
+      "context": "build",
+      "command": "cmd.exe",
+      "args": [
+        "${file}"
+      ],
+      "inheritEnvironments": [
+        "msvc-x86"
+      ],
+      "outputs": []
+    },
+    {
+      "taskName": ".BAT Batch File Runner",
+      "taskType": "launch",
+      "appliesTo": "*.bat",
+      "context": "build",
+      "command": "cmd.exe",
+      "args": [
+        "${file}"
+      ],
+      "inheritEnvironments": [
+        "msvc-x86"
+      ],
+      "outputs": []
+    },
+    {
+      "taskName": "PowerShell Script Runner",
+      "taskType": "launch",
+      "appliesTo": "*.ps1",
+      "context": "build",
+      "command": "powershell.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${file}"
+      ],
+      "inheritEnvironments": [
+        "msvc-x86"
+      ],
+      "outputs": []
+    },
+    {
+      "taskLabel": "task-sign",
+      "appliesTo": "sign.cmd",
+      "type": "launch"
     }
   ]
 }

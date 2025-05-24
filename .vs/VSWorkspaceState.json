@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\.github",
+    "\\.github\\workflows",
+    "\\Misc"
   ],
-  "SelectedNode": "\\sign.cmd",
+  "SelectedNode": "\\Misc\\inno.iss",
   "PreviewInSolutionExplorer": false
 }

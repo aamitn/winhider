@@ -129,11 +129,13 @@ Yes! with the installer and zip-bundles we provide 2 ways to achieve this :
 - If you dont have Autohotkey installed in your system, you could also use the precompiled `hide_hotkey.exe` to use hotkey functions
 	> :
 	**Hotkey Legend**  
-	`Ctrl+H` -> Hide from Screenshare   
-	`Ctrl+J` -> Unhide from Screenshare   
-	`Ctrl+K` -> Hide from Screenshare   
-	`Ctrl+L` -> Hide from Screenshare   
-	`Ctrl+Q` -> Exit/Quit Hotkey Script
+	`Ctrl+Shift+H` -> Hide from Screenshare   
+	`Ctrl+Shift+J` -> Unhide from Screenshare   
+	`Ctrl+Shift+K` -> Hide from Taskbar/Switcher  
+	`Ctrl+Shift+L` -> Unhide from Taskbar/Switcher  
+	`Ctrl+Shift+I` -> Show Current Window Process Info
+	`Ctrl+F10` 	   -> Show/Hide Toggle Autohotkey Script Runner System Tray Icon
+	`Ctrl+Shift+Q` -> Exit/Quit Hotkey Script
 	 >
 
 ## Contributing

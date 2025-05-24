@@ -14,8 +14,6 @@ begin
   else 
     Result := 'Winhider_32bit.exe';
 end;
-
-[Code]
 function MyAppExeGuiName(Param: String): String;
 begin
   if IsWin64 then 
@@ -49,6 +47,9 @@ WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64
 SetupIconFile=whicon.ico
 
+UninstallDisplayIcon={app}\{code:MyAppExeName}
+UninstallDisplayName={#MyAppName}
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -68,4 +69,4 @@ Name: "{autoprograms}\{#MyAppName}GUI"; Filename: "{app}\{code:MyAppExeGuiName}"
 Name: "{autodesktop}\{#MyAppName}GUI"; Filename: "{app}\{code:MyAppExeGuiName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{code:MyAppExeGuiName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{code:MyAppExeGuiName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent; WorkingDir: "{app}"

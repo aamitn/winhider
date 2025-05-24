@@ -27,6 +27,8 @@
 #define IDT_PROCESS_REFRESH_TIMER 2001 // Timer ID
 #define IDC_CHK_AUTOREFRESH 1009
 #define IDC_BTN_KILL 1010
+#define IDC_BTN_HOTKEY 1011
+#define IDT_HOTKEY_CHECK_TIMER 2002 
 
 
 // Global Variables:
@@ -35,6 +37,8 @@ WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 bool show64bit = true; // Default to 64-bit
 bool autoRefreshEnabled = true;
+bool g_hotkeyHandlerRunning = false;
+HANDLE g_hotkeyProcessHandle = NULL;
 int g_processRefreshIntervalMs = 1000; // Timer interval in milliseconds - 1 second
 HIMAGELIST g_hImageList = NULL;
 struct ProcessState {
@@ -119,6 +123,15 @@ std::wstring GetProcessPath(DWORD processID) {
     return L"";
 }
 
+bool IsHotkeyProcessRunning() {
+    if (g_hotkeyProcessHandle == NULL) return false;
+
+    DWORD exitCode;
+    if (GetExitCodeProcess(g_hotkeyProcessHandle, &exitCode)) {
+        return (exitCode == STILL_ACTIVE);
+    }
+    return false;
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance,
@@ -329,7 +342,7 @@ void RunWinHiderCommand(const std::wstring& args, HWND hWnd, bool use64bit)
 //  WM_DESTROY  - post a quit message and return
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static HWND hList, hBtnHide, hBtnUnhide, hBtnHideTask, hBtnUnhideTask, hBtnRefresh, hRadio64, hRadio32, hChkAutoRefresh, hBtnKill;
+    static HWND hList, hBtnHide, hBtnUnhide, hBtnHideTask, hBtnUnhideTask, hBtnRefresh, hRadio64, hRadio32, hChkAutoRefresh, hBtnKill, hBtnHotkey;
     static HWND hGroupBox1, hGroupBox2;
     static HFONT hFontDefault, hFontButton, hFontTitle; // Font handles
 
@@ -412,6 +425,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SendMessageW(hRadio32, WM_SETFONT, (WPARAM)hFontDefault, TRUE);
 
         SendMessageW(hRadio64, BM_SETCHECK, BST_CHECKED, 0);
+
 
         // ListView with modern styling
         int listTop = MARGIN + RADIO_HEIGHT + 20;
@@ -513,21 +527,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hWnd, (HMENU)IDC_BTN_KILL, hInst, NULL);
         SendMessageW(hBtnKill, WM_SETFONT, (WPARAM)hFontButton, TRUE);
 
+		// Hotkey Handler Button
+        hBtnHotkey = CreateWindowW(L"BUTTON", L"🔑 Activate Hotkeys",
+            WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+            MARGIN + 450, btnStartY - BUTTON_HEIGHT - 10, BUTTON_WIDTH - 30, BUTTON_HEIGHT,
+            hWnd, (HMENU)IDC_BTN_HOTKEY, hInst, NULL);
+        SendMessageW(hBtnHotkey, WM_SETFONT, (WPARAM)hFontButton, TRUE);
+
         PopulateProcessList(hList, show64bit);
     }
     break;
 
     // Refresh process list with set timer interval
     case WM_TIMER:
-        if (wParam == IDT_PROCESS_REFRESH_TIMER && autoRefreshEnabled)
+        if (wParam == IDT_PROCESS_REFRESH_TIMER && autoRefreshEnabled) {
             PopulateProcessList(hList, show64bit);
+        }
+        else if (wParam == IDT_HOTKEY_CHECK_TIMER) {
+            if (g_hotkeyHandlerRunning && !IsHotkeyProcessRunning()) {
+                // Process was terminated externally
+                g_hotkeyHandlerRunning = false;
+                CloseHandle(g_hotkeyProcessHandle);
+                g_hotkeyProcessHandle = NULL;
+                KillTimer(hWnd, IDT_HOTKEY_CHECK_TIMER);
+                SetWindowTextW(hBtnHotkey, L"🔑 Activate Hotkeys");
+            }
+        }
         break;
 
     case WM_GETMINMAXINFO:
     {
 		// Set minimum window size
         MINMAXINFO* pMinMax = (MINMAXINFO*)lParam;
-        pMinMax->ptMinTrackSize.x = 630; // Minimum width
+        pMinMax->ptMinTrackSize.x = 650; // Minimum width
         pMinMax->ptMinTrackSize.y = 400; // Minimum height
         return 0;
     }
@@ -596,6 +628,52 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 else {
                     MessageBoxW(hWnd, L"Failed to open process for termination.", L"Error", MB_ICONERROR);
                 }
+            }
+            return 0;
+        }
+
+        case IDC_BTN_HOTKEY:
+        {
+            if (!g_hotkeyHandlerRunning) {
+                // Start the hotkey handler
+                STARTUPINFOW si = { sizeof(si) };
+                PROCESS_INFORMATION pi;
+                if (CreateProcessW(L"hide_hotkey.exe", NULL, NULL, NULL, FALSE,
+                    0, NULL, NULL, &si, &pi)) {
+                    g_hotkeyProcessHandle = pi.hProcess;
+                    CloseHandle(pi.hThread);
+                    g_hotkeyHandlerRunning = true;
+                    SetWindowTextW(hBtnHotkey, L"🔑 Deactivate Hotkeys");
+                    // Start checking timer
+                    SetTimer(hWnd, IDT_HOTKEY_CHECK_TIMER, 1000, NULL); // Check every second
+                    MessageBoxW(hWnd, LR"(Hotkey Handler started successfully!
+Use the following hotkeys:
+Ctrl+Shift+H - Hide from Screenshare
+Ctrl+Shift+J - Unhide from Screenshare
+Ctrl+Shift+K - Hide from Taskbar
+Ctrl+Shift+L - Unhide from Taskbar
+Ctrl+Shift+I - Show Active Window Info
+Ctrl+Shift+Q - Exit Handler
+Ctrl+F10 - Toggle Hide/Unhide Hotekey Handler System Tray)",
+L"Hotkey Handler Started", MB_ICONINFORMATION);
+                }
+                else {
+                    MessageBoxW(hWnd, L"Failed to start hide_hotkey.exe. Is it in the same directory?",
+                        L"Error", MB_ICONERROR);
+                }
+            }
+            else {
+                // Stop the hotkey handler
+                if (g_hotkeyProcessHandle) {
+                    TerminateProcess(g_hotkeyProcessHandle, 0);
+                    CloseHandle(g_hotkeyProcessHandle);
+                    g_hotkeyProcessHandle = NULL;
+                }
+                g_hotkeyHandlerRunning = false;
+                KillTimer(hWnd, IDT_HOTKEY_CHECK_TIMER);
+                SetWindowTextW(hBtnHotkey, L"🔑 Activate Hotkeys");
+                MessageBoxW(hWnd, L"Hotkey Handler stopped successfully!",
+                    L"Hotkey Handler Stopped", MB_ICONINFORMATION);
             }
             return 0;
         }
@@ -693,6 +771,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             MoveWindow(hBtnRefresh, MARGIN + 450, btnStartY + 20, 120, BUTTON_HEIGHT, TRUE);
             MoveWindow(hBtnKill, MARGIN + 450, btnStartY + BUTTON_HEIGHT + 20, 120, BUTTON_HEIGHT, TRUE);
             MoveWindow(hChkAutoRefresh, MARGIN + 450, MARGIN, 140, 25, TRUE); 
+            MoveWindow(hBtnHotkey, MARGIN + 450, btnStartY - BUTTON_HEIGHT - 10, BUTTON_WIDTH-30, BUTTON_HEIGHT, TRUE);
 
         }
         break;
@@ -753,7 +832,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (hFontButton) DeleteObject(hFontButton);
         if (hFontTitle) DeleteObject(hFontTitle);
 
+        if (g_hotkeyProcessHandle) {
+            TerminateProcess(g_hotkeyProcessHandle, 0);
+            CloseHandle(g_hotkeyProcessHandle);
+        }
+
+        //Kill Timers on cleanup
         KillTimer(hWnd, IDT_PROCESS_REFRESH_TIMER);
+        KillTimer(hWnd, IDT_HOTKEY_CHECK_TIMER);
         PostQuitMessage(0);
         break;
 

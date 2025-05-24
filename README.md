@@ -83,7 +83,7 @@ To use this application, you can either use the installer or the portable versio
 
 ### Sign Release Binaries
 - Use `sign.cmd` to sign the release binaries and installer. This is optional but recommended for distribution. This script signs `.exe` and `.dll` files using `signtool.exe` and a `.pfx` certificate.
-- Our provided signing certificate is in `.pfx` format is at [`./Misc/WinHider.pfx`](https://#).
+- Our provided signing certificate is in `.pfx` format is at [`./Misc/WinHider.pfx`](./Misc/BitmutexCert.pfx).
 - 🔐 **Default Behavior:** Running without arguments signs all `.exe` and `.dll` files in `Build\bin\Release` using the default password
 - ⚙️ Arguments
 
@@ -93,6 +93,9 @@ To use this application, you can either use the installer or the portable versio
 	| `--signinstaller`<br>`-i`    | Sign only installer `.exe` files in `Misc\output`                               |
 	| `--signall`<br>`-a`          | Sign both main binaries and installer files                                     |
 	| `--help`<br>`-h`             | Show help message                                                               |
+	```bash
+	Example : `sign.cmd -a -p "mypass"`
+	```
 - 🔗 **Timestamp Server:**  `http://timestamp.comodoca.com/authenticode` (Uses Comodo’s timestamp server)
 > ⚠️ **Important:** Password must be enclosed in quotes. Avoid hardcoding passwords—pass them securely using environment variables or CI/CD secrets.
 
@@ -124,9 +127,10 @@ _Tip: you can hide the Projector window from view too._
 
 #### Could I automatically hide windows using a hotkey?
 
-Yes! with the installer and zip-bundles we provide 2 ways to achieve this : 
-- An Autohotkey(.ahk) script named `hide_hotkey.ahk` which could be run using Autohotkey v2+
-- If you dont have Autohotkey installed in your system, you could also use the precompiled `hide_hotkey.exe` to use hotkey functions
+Yes! with the installer and zip-bundles we provide 3 ways to achieve this : 
+- An Autohotkey(.ahk) script named `hide_hotkey.ahk` which could be run using Autohotkey v2+.
+- If you dont have Autohotkey installed in your system, you could also use the precompiled `hide_hotkey.exe` to use hotkey functions.
+- From GUI, just click the `Activate Hotkeys` to activate hotkeys.
 	> :
 	**Hotkey Legend**  
 	`Ctrl+Shift+H` -> Hide from Screenshare   
